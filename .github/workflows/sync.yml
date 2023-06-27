@@ -27,7 +27,7 @@ jobs:
     - name: Create pull request
       run: |
          export LC_ALL=C
-         case $(gh pr edit -B repo-sync --title "Pulling ${{ github.ref }} into main" || gh pr create -l "sync" -B main --title "Pulling ${{ github.ref }} into main" -H repo-sync -b "This PR synchronizes repos." 2>&1) in 
+         case $(gh pr create -l "sync" -B main --title "Pulling ${{ github.ref }} into main" -H repo-sync -b "This PR synchronizes repos.") in 
               *"No commits between main and repo-sync"*)
                   echo >&2 "No commits between main and repo-sync."
                   exit 0
