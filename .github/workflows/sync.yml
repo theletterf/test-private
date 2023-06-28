@@ -12,7 +12,7 @@ env:
 
 jobs:
   repo-sync:
-    name: Synchronize repositories
+    name: Checkout repo and verify commits
     if: ${{ github.repository == 'theletterf/test-private' || github.repository == 'theletterf/testprivateb' }}
     runs-on: ubuntu-latest
     steps:
@@ -24,6 +24,17 @@ jobs:
         source_branch: main
         destination_branch: repo-sync
         github_token: ${{ secrets.MY_TOKEN }}
+    - name: Check if branch is ahead of main
+      run: |
+        if ! git merge-base --is-ancestor origin/main ${{ github.event.pull_request.head.sha }};
+        then echo "This branch is not up to date with main";
+        exit 1; fi
+
+  create-pr:
+    name: Create pull request
+    needs: repo-sync
+    runs-on: ubuntu-latest
+    steps:
     - name: Check if PR already exists
       id: check
       run: |
