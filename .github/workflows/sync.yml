@@ -24,6 +24,19 @@ jobs:
         source_branch: main
         destination_branch: repo-sync
         github_token: ${{ secrets.MY_TOKEN }}
+    - name: Check if PR already exists
+      id: check
+      run: |
+        prs=$(gh pr list \
+          --repo "$GITHUB_REPOSITORY" \
+          --json baseRefName,headRefName \
+          --jq '
+              map(select(.baseRefName == "main" and .headRefName == "repo-sync"))
+              | length
+          ')
+        if ((prs > 0)); then
+          echo "skip=true" >> "$GITHUB_OUTPUT"
+        fi
     - name: Create Pull Request
       uses: actions/github-script@v6
       with:
@@ -46,4 +59,3 @@ jobs:
             issue_number: result.data.number,
             labels: ['sync', 'automated']
            });
-   
